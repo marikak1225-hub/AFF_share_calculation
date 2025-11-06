@@ -7,7 +7,7 @@ from datetime import date
 st.title("メディア別シェア率分析ツール")
 
 # ファイルアップロード
-uploaded_file = st.file_uploader("デイリーレポートアップロード✨該当シートのみ※パスワードと数式解除して", type=["xlsx"])
+uploaded_file = st.file_uploader("デイリーレポートをアップロード✨該当シートのみ※パスワードと数式解除して", type=["xlsx"])
 
 if uploaded_file:
     # Excel読み込み
@@ -36,11 +36,12 @@ if uploaded_file:
         # 選択範囲の列インデックス
         selected_cols = [i for i, d in zip(date_cols, valid_dates) if start_date <= d.date() <= end_date]
 
-        # メディア別集計（D列、合計除外）
+        # メディア別集計（D列、除外条件適用）
+        exclude_keywords = ["合計", "Site", "other【ポイントサイト】", "other【比較サイト】"]
         result = []
         for idx in range(len(df)):
             media_name = df.iloc[idx, 3]
-            if pd.notna(media_name) and "合計" not in str(media_name):
+            if pd.notna(media_name) and not any(keyword in str(media_name) for keyword in exclude_keywords):
                 forecast_sum = 0
                 actual_sum = 0
 
@@ -64,8 +65,8 @@ if uploaded_file:
             result_df["Forecast Share %"] = (result_df["Forecast"] / total_forecast * 100).round(2)
             result_df["Actual Share %"] = (result_df["Actual"] / total_actual * 100).round(2)
 
-            # テーブル表示（シェア率）
-            st.subheader("メディア別詳細シェア率")
+            # テーブル表示
+            st.subheader("メディア別詳細シェア率（除外済み）")
             st.dataframe(result_df)
 
             # 円グラフ表示
