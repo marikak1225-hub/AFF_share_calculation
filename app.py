@@ -4,10 +4,10 @@ import plotly.express as px
 import io
 from datetime import date
 
-st.title("メディア別シェア率分析ツール（期間指定＋目標割り振り）")
+st.title("メディア別シェア率分析ツール")
 
 # ファイルアップロード
-uploaded_file = st.file_uploader("Excelファイルをアップロードしてください", type=["xlsx"])
+uploaded_file = st.file_uploader("デイリーレポートアップロード✨該当シートのみ※パスワードと数式解除して", type=["xlsx"])
 
 if uploaded_file:
     # Excel読み込み
