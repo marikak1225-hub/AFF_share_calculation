@@ -75,6 +75,9 @@ if uploaded_file:
             result_df["Forecast Share %"] = (result_df["Forecast"] / total_forecast * 100).round(2)
             result_df["Actual Share %"] = (result_df["Actual"] / total_actual * 100).round(2)
 
+            # ✅ Actualの降順でソート
+            result_df = result_df.sort_values(by="Actual", ascending=False).reset_index(drop=True)
+
             # テーブル表示
             st.subheader("メディア別詳細シェア率（除外済み）")
             st.dataframe(result_df)
