@@ -37,21 +37,31 @@ if uploaded_file:
         selected_cols = [i for i, d in zip(date_cols, valid_dates) if start_date <= d.date() <= end_date]
 
         # メディア別集計（D列、除外条件適用）
-        exclude_keywords = ["合計", "Site", "other【ポイントサイト】", "other【比較サイト】"]
+        exclude_keywords = ["合計", "Site"]
         result = []
+
         for idx in range(len(df)):
             media_name = df.iloc[idx, 3]
             if pd.notna(media_name) and not any(keyword in str(media_name) for keyword in exclude_keywords):
                 forecast_sum = 0
                 actual_sum = 0
 
-                # 下の行でForecastとActualを探す
+                # 下の行でForecastとActualを探す（10行以内）
                 for j in range(idx + 1, min(idx + 10, len(df))):
                     label = str(df.iloc[j, 19]).strip()
-                    if label == "Forecast":
-                        forecast_sum = df.iloc[j, selected_cols].sum()
-                    elif label.startswith("Actual"):
-                        actual_sum = df.iloc[j, selected_cols].sum()
+                    row_values = df.iloc[j, selected_cols]
+
+                    # Forecastを最初に見つけたら記録
+                    if forecast_sum == 0 and label == "Forecast":
+                        forecast_sum = row_values.sum()
+
+                    # Actualを最初に見つけたら記録
+                    if actual_sum == 0 and label.startswith("Actual"):
+                        actual_sum = row_values.sum()
+
+                    # 両方見つかったら探索終了
+                    if forecast_sum > 0 and actual_sum > 0:
+                        break
 
                 if forecast_sum > 0 or actual_sum > 0:
                     result.append({"Media": media_name, "Forecast": forecast_sum, "Actual": actual_sum})
@@ -89,7 +99,7 @@ if uploaded_file:
             user_target = st.number_input("全体目標件数を入力してください", min_value=0, value=1000)
             result_df["Allocated Target"] = (user_target * result_df["Actual Share %"] / 100).round(0)
 
-            # 割り振り結果テーブル（Media, Actual, Actual Share %, Allocated Targetのみ）
+            # 割り振り結果テーブル
             allocation_df = result_df[["Media", "Actual", "Actual Share %", "Allocated Target"]]
 
             st.subheader("目標件数割り振り結果")
