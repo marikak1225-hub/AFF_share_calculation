@@ -75,11 +75,11 @@ if uploaded_file:
             result_df["Forecast Share %"] = (result_df["Forecast"] / total_forecast * 100).round(2)
             result_df["Actual Share %"] = (result_df["Actual"] / total_actual * 100).round(2)
 
-            # ✅ Actualの降順でソート
+            # Actualの降順でソート
             result_df = result_df.sort_values(by="Actual", ascending=False).reset_index(drop=True)
 
             # テーブル表示
-            st.subheader("メディア別詳細シェア率（除外済み）")
+            st.subheader("メディア別詳細シェア率")
             st.dataframe(result_df)
 
             # 円グラフ表示
@@ -99,7 +99,7 @@ if uploaded_file:
             )
 
             # 目標件数入力
-            user_target = st.number_input("全体目標件数を入力してください", min_value=0, value=1000)
+            user_target = st.number_input("目標件数を入力してください", min_value=0, value=1000)
             result_df["Allocated Target"] = (user_target * result_df["Actual Share %"] / 100).round(0)
 
             # 割り振り結果テーブル
